@@ -45,9 +45,9 @@
     "config": "1.27.0",
     "cors": "2.8.4",
     "express": "4.16.2",
-    "jest-codemods": "^0.13.9",
     "json5": "0.5.1",
     "serve-favicon": "2.4.5",
+    "socket.io": "2.0.4",
     "winston": "2.4.0"
   },
   "devDependencies": {
@@ -79,11 +79,6 @@
     "lint": "eslint src test",
     "doc": "jsdoc src/**/*.js --destination ./.jsdoc",
     "watch": "nodemon",
-    "remove:all": "npm run remove:helloworld && npm run remove:socketio && npm run remove:newrelic",
-    "remove:helloworld": "node scripts/helloworld.js remove",
-    "add:socketio": "node scripts/socketio.js add && npm install socket.io@2.0.4 --save",
-    "remove:socketio": "node scripts/socketio.js remove",
-    "add:newrelic": "node scripts/newrelic.js add && npm install newrelic@2.4.1 --save",
-    "remove:newrelic": "node scripts/newrelic.js remove"
+    "remove:helloworld": "node scripts/helloworld.js remove"
   }
 }

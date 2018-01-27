@@ -1,7 +1,6 @@
 const appConfig = require('config');
 const express = require('express');
 const http = require('http');
-/* scripts/socketio.js
 const socketio = require('socket.io');
 scripts/socketio.js */
 const winston = require('winston');
@@ -32,9 +31,6 @@ class Assembly {
     this._initGlobal();
 
     // tools
-    /* scripts/newrelic.js
-    require('newrelic'); // eslint-disable-line global-require
-    scripts/newrelic.js */
 
     // configs
     this.config = this._initConfig();

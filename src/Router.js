@@ -11,9 +11,7 @@ class Router {
     config,
     monitoring,
     serviceDriver,
-    /* scripts/socketio.js
     socketDriver,
-    scripts/socketio.js */
     /* scripts/helloworld.js */
     helloworld,
     /* scripts/helloworld.js */
@@ -27,9 +25,7 @@ class Router {
     this.config = config;
     this.monitoring = monitoring;
     this.serviceDriver = serviceDriver;
-    /* scripts/socketio.js
     this.socketDriver = socketDriver;
-    scripts/socketio.js */
     /* scripts/helloworld.js */
     this.helloworld = helloworld;
     /* scripts/helloworld.js */
@@ -48,14 +44,12 @@ class Router {
     this.serviceDriver.get('/', (req, res) => this.homeController(req, res));
 
     // socket
-    /* scripts/socketio.js
     this.socketDriver.on('connection', socket => this.socketController(socket));
 
     // example client page to connect with the websocket
     const socketioClientDistPath = path.join(__dirname, '../node_modules/socket.io-client/dist');
-    this.serviceDriver.use('/lib', require('express').static(socketioClientDistPath));
+    this.serviceDriver.use('/lib', require('express').static(socketioClientDistPath)); // eslint-disable-line
     this.serviceDriver.get('/hellosocket', this.handleErrors(this.sayHelloSocketController));
-    scripts/socketio.js */
 
     // NOTE: this is where you would register your routes
 
@@ -161,8 +155,6 @@ class Router {
   }
   /* scripts/helloworld.js */
 
-  /* scripts/socketio.js
-
   // creates a testing html page
   sayHelloSocketController(req, res) {
     res.send(`<!doctype html><html><head></head><body><div id="debug"></div><script src="/lib/socket.io.slim.js"></script><script>
@@ -190,7 +182,6 @@ class Router {
       this.logger.debug('(socket) A client disconnected');
     });
   }
-  scripts/socketio.js */
 }
 
 module.exports = {
