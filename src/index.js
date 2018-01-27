@@ -35,7 +35,10 @@ class Main {
    * @memberOf Main
    */
   async startService() {
-    const { config, router, logger, httpServer } = this.assembly;
+    const {
+      config, router, logger, httpServer,
+    } = this.assembly;
+
     assert(router, 'expected router');
     assert(logger, 'expected logger');
     assert(httpServer, 'expected httpServer');
@@ -70,13 +73,12 @@ class Main {
   /* istanbul ignore next: hard to test process.exit */
   async exit({ code, exit, err }) {
     if (err) {
-      console.error(`Exit (${code}) with error`, err);
+      console.error(`Exit (${code}) with error`, err); // eslint-disable-line no-console
     }
 
     if (exit) {
       const { monitoring } = this.assembly;
       await monitoring.stop();
-      await this.assembly.clean();
 
       process.exit(code);
     }
@@ -112,7 +114,7 @@ async function run() {
     await main.startService();
     await main.startMonitoring();
   } catch (err) /* istanbul ignore next: hard to test process.exit */ {
-    console.error('Unexpected error during initialization', err);
+    console.error('Unexpected error during initialization', err); // eslint-disable-line no-console
     main.exit({
       code: returnCodes.UNCAUGHTEXCEPTION,
       exit: true,

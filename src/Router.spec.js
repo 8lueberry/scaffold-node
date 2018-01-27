@@ -1,5 +1,6 @@
 /* global loggerForTests wait sinon expect mocks fixtures */
 
+const errors = require('./errors');
 const pkg = require('../package.json');
 const proxyquire = require('proxyquire');
 
@@ -20,7 +21,7 @@ describe('Test suite for Router', () => {
       socketDriver: { on: sinon.stub() },
     };
 
-    Router = proxyquire('./Router', {
+    Router = proxyquire('./Router', { // eslint-disable-line
       ypcloud: sinon.stub().returns(() => {}),
     }).Router;
   });
@@ -95,7 +96,10 @@ describe('Test suite for Router', () => {
     it('should handle error', async () => {
       // prepare
       const router = new Router(routerArgs);
-      const testErr = new Error('testErr');
+      const testErr = new errors.AppError({
+        code: 'testErrCode',
+        message: 'testErr',
+      });
       const reqMock = new mocks.express.RequestMock();
       const resMock = new mocks.express.ResponseMock();
 
@@ -108,9 +112,8 @@ describe('Test suite for Router', () => {
       // result
       function test() {
         expect(resMock.json).to.have.been.calledWith({
-          result: false,
           errors: {
-            codes: ['ERR_INTERNAL_ERROR'],
+            codes: ['testErrCode'],
           },
         });
       }

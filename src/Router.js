@@ -22,7 +22,7 @@ class Router {
     assert(config, 'expected config');
     assert(monitoring, 'expected monitoring');
     assert(serviceDriver, 'expected serviceDriver');
-    
+
     this.logger = logger;
     this.config = config;
     this.monitoring = monitoring;
@@ -39,14 +39,14 @@ class Router {
     // global middleware
     this.serviceDriver.use(favicon(path.join(__dirname, 'favicon.ico')));
     this.serviceDriver.use(bodyParser.json()); // for parsing application/json
-    this.serviceDriver.use(
-      bodyParser.urlencoded({ extended: true }) // application/x-www-form-urlencoded
-    );
+    this.serviceDriver.use(bodyParser.urlencoded({ // application/x-www-form-urlencoded
+      extended: true,
+    }));
 
     // global routes
     this.serviceDriver.get('/health', cors(), this.handleErrors(this.healthController));
     this.serviceDriver.get('/', (req, res) => this.homeController(req, res));
-    
+
     // socket
     /* scripts/socketio.js
     this.socketDriver.on('connection', socket => this.socketController(socket));
@@ -109,7 +109,9 @@ class Router {
   errorMiddleware(err, req, res, /* eslint-disable */ next) {
     this.logger.error(err, 'Unexpected route error');
     const body = {
-      errorMessage: err.message,
+      errors: {
+        codes: [err.code],
+      },
     };
     res.json(body);
   }

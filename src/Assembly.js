@@ -1,12 +1,9 @@
 const appConfig = require('config');
 const express = require('express');
-const fs = require('fs');
 const http = require('http');
-const pkg = require('../package.json');
 /* scripts/socketio.js
 const socketio = require('socket.io');
 scripts/socketio.js */
-const util = require('util');
 const winston = require('winston');
 const { Monitoring } = require('./Monitoring');
 const { Router } = require('./Router');
@@ -14,8 +11,6 @@ const { Router } = require('./Router');
 /* scripts/helloworld.js */
 const { HelloWorld } = require('./helloworld/HelloWorld');
 /* scripts/helloworld.js */
-
-const readFile = util.promisify(fs.readFile);
 
 /**
  * This class is responsible to build all the application common dependencies
@@ -30,12 +25,10 @@ class Assembly {
    *
    * @memberof Assembly
    */
-  async init(/* istanbul ignore next: default values */ {
-    externalConfigPath = '/run/config/ypcloud.io/config.json' } = {}
-  ) {
+  async init() {
     // core
     this.assembly = this;
-    this.logger = await this._initLogger();
+    this.logger = this._initLogger();
     this._initGlobal();
 
     // tools
@@ -44,7 +37,7 @@ class Assembly {
     scripts/newrelic.js */
 
     // configs
-    this.config = await this._initConfig({ externalConfigPath });
+    this.config = this._initConfig();
 
     // service
     const serviceItems = await this._initService();
@@ -97,7 +90,7 @@ class Assembly {
    * @returns
    * @memberof Assembly
    */
-  async _initConfig({ externalConfigPath }) {
+  _initConfig() {
     return appConfig;
   }
 
@@ -108,7 +101,7 @@ class Assembly {
    * @returns
    * @memberof Assembly
    */
-  async _initLogger() {
+  _initLogger() {
     return winston;
   }
 
@@ -125,7 +118,7 @@ class Assembly {
     /* scripts/socketio.js
     const socketDriver = socketio(httpServer);
     scripts/socketio.js */
-    
+
     return {
       httpServer,
       serviceDriver,
@@ -157,16 +150,6 @@ class Assembly {
     return {
       // myConnectionMongo,
     };
-  }
-
-  /**
-   * Cleans the instances. When the app stops, this method is called. We can put db
-   * connections disconnection for example.
-   *
-   * @memberof Assembly
-   */
-  async clean() {
-    // NOTE: This is where you put your cleaning before the process exits
   }
 }
 

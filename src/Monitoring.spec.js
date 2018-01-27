@@ -19,7 +19,7 @@ describe('Test suite for Monitoring', () => {
     const monitoring = new Monitoring(monitoringArgs);
 
     // run
-    const result = monitoring.getCurrentCounters();
+    const result = monitoring.counters;
 
     // result
     expect(result).to.exist();
@@ -98,7 +98,7 @@ describe('Test suite for Monitoring', () => {
       // run
       await monitoring.stop();
       await wait(1);
-      const callCount = monitoringArgs.logger.info.callCount;
+      const { callCount } = monitoringArgs.logger.info;
       await wait(5);
 
       // result

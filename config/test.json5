@@ -3,8 +3,7 @@
  */
 
 {
-  test: 'test',
-  apigateway: {
-    host: 'http://host',
+  server: {
+    port: 1234,
   },
 }

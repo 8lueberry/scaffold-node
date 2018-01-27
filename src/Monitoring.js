@@ -3,6 +3,24 @@ const { EventEmitter } = require('events');
 
 const oneHour = 1 * 60 * 60 * 1000;
 
+/**
+ * The initial counter values
+ *
+ * @returns
+ * @memberof Monitoring
+ */
+function initialCounters() {
+  // NOTE: add the counters you want to store
+  return {
+    /* scripts/helloworld.js */
+    helloworld: {
+      count: 0,
+      names: {},
+    },
+    /* scripts/helloworld.js */
+  };
+}
+
 class Monitoring extends EventEmitter {
   constructor({ config, logger }) {
     super();
@@ -12,26 +30,8 @@ class Monitoring extends EventEmitter {
     this.logger = logger;
     this.config = config;
 
-    this._counters = this._initialCounters();
+    this.counters = initialCounters();
     this._intervals = {}; // keep track of the setInterval ids
-  }
-
-  /**
-   * The initial counter values
-   *
-   * @returns
-   * @memberof Monitoring
-   */
-  _initialCounters() {
-    // NOTE: add the counters you want to store
-    return {
-      /* scripts/helloworld.js */
-      helloworld: {
-        count: 0,
-        names: {},
-      },
-      /* scripts/helloworld.js */
-    };
   }
 
   /**
@@ -49,7 +49,7 @@ class Monitoring extends EventEmitter {
     if (helloworld) {
       helloworld.on('call', (name) => {
         const counter = this._counters.helloworld;
-        counter.count++;
+        counter.count += 1;
         counter.names[name] = counter.names[name] ? counter.names[name] + 1 : 1;
       });
     }
@@ -90,13 +90,11 @@ class Monitoring extends EventEmitter {
 
     this.logger.info(`monitoring.console setup every ${interval}ms`);
     this._intervals.console = setInterval(() => {
-      const counters = this.getCurrentCounters();
-      this.logger.info(
-        JSON.stringify(
-          counters,
-          null,
-          consoleConfig.pretty ? /* istanbul ignore next */ '  ' : '',
-        ));
+      this.logger.info(JSON.stringify(
+        this.counters,
+        null,
+        consoleConfig.pretty ? /* istanbul ignore next */ '  ' : '',
+      ));
     }, interval);
   }
 
@@ -115,17 +113,6 @@ class Monitoring extends EventEmitter {
           this._intervals[monitoringType] = null;
         }
       });
-  }
-
-  /**
-   * Retrieves the current service stats.
-   *
-   * @returns {any} - The service counter stats
-   *
-   * @memberof Monitoring
-   */
-  getCurrentCounters() {
-    return this._counters;
   }
 }
 

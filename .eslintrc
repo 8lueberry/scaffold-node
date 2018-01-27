@@ -1,6 +1,11 @@
 {
-  "extends": "yp-base",
+  "extends": "airbnb",
   "env": {
+    "es6": true,
     "mocha": true
+  },
+  "rules": {
+    "class-methods-use-this": "off",
+    "no-underscore-dangle": "off"
   }
 }

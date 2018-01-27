@@ -1,5 +1,0 @@
---ui bdd
--t 90000
-
-./test/helpers/**/*.js
-./test/integration/**/*.spec.js

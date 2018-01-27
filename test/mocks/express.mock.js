@@ -1,6 +1,4 @@
 /* global sinon */
-const core = require('../../src/core');
-
 class AppMock {
   constructor() {
     this.static = sinon.stub();
@@ -95,8 +93,6 @@ class ResponseMock {
     this.headers = [];
     this.header = sinon.stub();
     this.setHeader = sinon.stub();
-
-    core.middlewares.responseFormatter(null, this, () => {});
   }
 }
 

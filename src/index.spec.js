@@ -1,4 +1,4 @@
-/* global loggerForTests sinon expect */
+/* global loggerForTests sinon expect fixtures */
 const proxyquire = require('proxyquire');
 const { EventEmitter } = require('events');
 
@@ -9,6 +9,8 @@ describe('Test suite for index', () => {
   let httpServerMock;
 
   beforeEach(() => {
+    const { config } = fixtures;
+
     routerMock = {
       registerRoutes: sinon.stub(),
     };
@@ -24,7 +26,7 @@ describe('Test suite for index', () => {
       Assembly: class {
         constructor() {
           this.init = sinon.stub();
-          this.clean = sinon.stub();
+          this.config = config;
           this.logger = loggerForTests;
           this.router = routerMock;
           this.monitoring = monitoringMock;
