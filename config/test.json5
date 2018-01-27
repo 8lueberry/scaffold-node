@@ -1,0 +1,10 @@
+/**
+ * Config fixture for unit test
+ */
+
+{
+  test: 'test',
+  apigateway: {
+    host: 'http://host',
+  },
+}
