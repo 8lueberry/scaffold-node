@@ -21,25 +21,46 @@
     ],
     "ext": "js json json5"
   },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js}",
+      "!**/node_modules/**"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": -10
+      }
+    }
+  },
   "dependencies": {
     "body-parser": "1.18.2",
     "config": "1.27.0",
     "cors": "2.8.4",
     "express": "4.16.2",
+    "jest-codemods": "^0.13.9",
     "json5": "0.5.1",
     "serve-favicon": "2.4.5",
-    "winston": "^2.4.0"
+    "winston": "2.4.0"
   },
   "devDependencies": {
     "chai": "4.1.0",
     "chai-as-promised": "7.1.1",
     "chai-http": "3.0.0",
     "dirty-chai": "2.0.1",
-    "eslint": "^4.16.0",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.6.0",
+    "eslint": "4.16.0",
+    "eslint-config-airbnb": "16.1.0",
+    "eslint-plugin-import": "2.8.0",
+    "eslint-plugin-jsx-a11y": "6.0.3",
+    "eslint-plugin-react": "7.6.0",
+    "jest": "22.1.4",
     "jsdoc": "3.5.3",
     "mocha": "3.4.2",
     "nodemon": "1.12.1",
