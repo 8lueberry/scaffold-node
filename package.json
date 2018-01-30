@@ -22,6 +22,10 @@
     "ext": "js json json5"
   },
   "jest": {
+    "bail": true,
+    "setupFiles": [
+      "./test/setup/index.js"
+    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.{js}",
@@ -51,10 +55,6 @@
     "winston": "2.4.0"
   },
   "devDependencies": {
-    "chai": "4.1.0",
-    "chai-as-promised": "7.1.1",
-    "chai-http": "3.0.0",
-    "dirty-chai": "2.0.1",
     "eslint": "4.16.0",
     "eslint-config-airbnb": "16.1.0",
     "eslint-plugin-import": "2.8.0",
@@ -62,16 +62,13 @@
     "eslint-plugin-react": "7.6.0",
     "jest": "22.1.4",
     "jsdoc": "3.5.3",
-    "mocha": "3.4.2",
     "nodemon": "1.12.1",
-    "nyc": "11.0.3",
-    "proxyquire": "1.8.0",
-    "replace-in-file": "3.0.0-beta.2",
-    "sinon": "2.3.8",
-    "sinon-chai": "2.12.0"
+    "replace-in-file": "3.0.0-beta.2"
   },
   "scripts": {
     "start": "node src/index.js",
+    "jest": "jest",
+    "jest:watch": "jest --watch",
     "test": "npm run lint && npm run coverage",
     "test:unit": "mocha",
     "coverage": "nyc --check-coverage --reporter=text --reporter=lcov mocha",

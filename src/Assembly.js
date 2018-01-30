@@ -2,7 +2,6 @@ const appConfig = require('config');
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
-scripts/socketio.js */
 const winston = require('winston');
 const { Monitoring } = require('./Monitoring');
 const { Router } = require('./Router');
@@ -39,9 +38,7 @@ class Assembly {
     const serviceItems = await this._initService();
     this.serviceDriver = serviceItems.serviceDriver;
     this.httpServer = serviceItems.httpServer;
-    /* scripts/socketio.js
     this.socketDriver = serviceItems.socketDriver;
-    scripts/socketio.js */
 
     // db connections
     this.connections = await this._initConnections();
@@ -111,16 +108,12 @@ class Assembly {
   async _initService() {
     const serviceDriver = express();
     const httpServer = http.Server(serviceDriver);
-    /* scripts/socketio.js
     const socketDriver = socketio(httpServer);
-    scripts/socketio.js */
 
     return {
       httpServer,
       serviceDriver,
-      /* scripts/socketio.js
       socketDriver,
-      scripts/socketio.js */
     };
   }
 

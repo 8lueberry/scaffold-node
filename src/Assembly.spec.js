@@ -1,49 +1,27 @@
-/* global expect fixtures loggerForTests */
+const { Assembly } = require('./Assembly');
 
-const proxyquire = require('proxyquire');
-const configHelper = require('config');
+jest.mock('./helloworld/HelloWorld');
 
 describe('Test suite for Assembly', () => {
-  let Assembly;
-  let config;
-  let initArgs;
+  test.only('should initialize', async () => {
+    // prepare
+    const assembly = new Assembly();
 
-  beforeEach(() => {
-    config = fixtures.config.clone();
-    config.util = configHelper.util;
+    // run
+    await assembly.init();
 
-    Assembly = proxyquire('./Assembly', { // eslint-disable-line
-      '../package.json': fixtures.pkg,
-      'yp-logger': loggerForTests,
-      config,
-    }).Assembly;
+    // result
+    expect(assembly.assembly).toBeDefined();
+    expect(assembly.logger).toBeDefined();
+    expect(assembly.config).toBeDefined();
+    expect(assembly.serviceDriver).toBeDefined();
+    expect(assembly.httpServer).toBeDefined();
+    expect(assembly.socketDriver).toBeDefined();
+    expect(assembly.connections).toBeDefined();
+    expect(assembly.monitoring).toBeDefined();
+    expect(assembly.router).toBeDefined();
+    expect(assembly.helloworld).toBeDefined();
 
-    initArgs = {
-      externalConfigPath: '',
-    };
-  });
-
-  describe('initialization', () => {
-    it('should initialize components', async () => {
-      // prepare
-      const assembly = new Assembly();
-
-      // run
-      async function run() {
-        return assembly.init(initArgs);
-      }
-
-      // result
-      function test() {
-        expect(assembly.logger).to.exist();
-        expect(assembly.config).to.exist();
-        expect(assembly.serviceDriver).to.exist();
-        expect(assembly.monitoring).to.exist();
-        expect(assembly.router).to.exist();
-      }
-
-      await run();
-      test();
-    });
+    expect(global.assembly).toEqual(assembly);
   });
 });

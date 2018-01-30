@@ -48,7 +48,7 @@ class Monitoring extends EventEmitter {
     /* istanbul ignore next: ignore test for sample code */
     if (helloworld) {
       helloworld.on('call', (name) => {
-        const counter = this._counters.helloworld;
+        const counter = this.counters.helloworld;
         counter.count += 1;
         counter.names[name] = counter.names[name] ? counter.names[name] + 1 : 1;
       });
