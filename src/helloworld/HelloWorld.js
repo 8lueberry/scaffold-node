@@ -6,32 +6,29 @@ class HelloWorld extends EventEmitter {
   /**
    * If you create your instance in the Assembly, you can use Object destructuring to get
    * your dependencies injected here.
-   *
-   * @param {any} { logger }
-   *
-   * @memberof HelloWorld
    */
   constructor({
     // NOTE: If you need any dependencies (built by Assembly), you just have to add it to the
     // constructor and it will be automatically injected using object deconstructing.
     logger,
     config, // eslint-disable-line no-unused-vars
-    connections, // eslint-disable-line no-unused-vars
   }) {
-    super();
+    super(); // EventEmitter
+
     assert(logger, 'expected logger');
+    assert(config && config.helloworld, 'expected config.helloworld');
 
     this._logger = logger;
+    this._greetings = config.helloworld.greetings;
+
+    // NOTE: if you need to create internal new objects, you have reference of the assembly
+    // this._myNewObject(global.assembly);
   }
 
-  /* istanbul ignore next: ignore test for sample code */
   sayHello({
+    // NOTE: The name param is actually passed by destructuring req.query (Router.js)
     name = 'World',
   }) {
-    // The name param is actually passed by destructuring req.query
-    // At this point, there should be no references to express or server framework.
-    // This is your business logic only.
-
     this._logger.debug('sayHello called');
 
     // Monitoring.js wants to monitor every time this is called
@@ -55,7 +52,8 @@ class HelloWorld extends EventEmitter {
       });
     }
 
-    return `Hello ${name}`;
+    // -> Hello World
+    return `${this._greetings} ${name}`;
   }
 }
 

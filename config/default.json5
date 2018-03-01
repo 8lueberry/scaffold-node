@@ -3,17 +3,13 @@
  * Internally it's using `node-config`: https://github.com/lorenwest/node-config/wiki/Configuration-Files
  *
  * DO NOT
- *   - Put secret or sensitive information (should be in yp console)
+ *   - Put secret or sensitive information
  *
  * DO
  *   - Group your config in logical containers (e.g. all the config needed for helloworld under the root key helloworld)
  *
  * TIPS
- *   - Create a local.json (will not be committed to git) to override the values with your values for running locally
- *
- * DEPLOYMENT
- *   During deployment, a console config file (/run/config/ypcloud.io/config.json) will override some of the values
-*    Configuring a section in console e.g. <your service>/dev/helloworld.json will override the section helloworld below
+ *   - Create a local.json5 (will not be committed to git) to override the values with your values for running locally
  */
 
 {
@@ -21,16 +17,22 @@
     port: 8008,
   },
 
-  helloworld: {
-    test: 'test',
+  logger: {
+    console: {
+      // The level to log in the console
+      // possible values: fatal, error, warn, info, debug, trace
+      level: 'debug',
+    },
   },
 
-  /**
-   * Configuration for the monitoring
-   */
   monitoring: {
     console: {
+      // The interval to log the app counters (Monitoring.js) in the console
       interval: 3600000, // 1h
     },
+  },
+
+  helloworld: {
+    greetings: 'Hello',
   },
 }

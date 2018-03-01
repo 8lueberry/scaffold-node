@@ -3,7 +3,6 @@
 const { Bootstrapper } = require('./Bootstrapper');
 const { mocks: assemblyMocks } = require('./Assembly');
 
-// mocks
 jest.mock('./Assembly');
 
 describe('bootstrap', () => {

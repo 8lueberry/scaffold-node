@@ -1,8 +1,6 @@
 const assert = require('assert');
 const { EventEmitter } = require('events');
 
-const oneHour = 1 * 60 * 60 * 1000;
-
 class Monitoring extends EventEmitter {
   constructor({ config, logger }) {
     super();
@@ -11,8 +9,9 @@ class Monitoring extends EventEmitter {
 
     this._logger = logger;
     this._monitoringConfig = config.monitoring || {};
-    this._intervals = {}; // keep track of the setInterval ids
-    this._counters = createInitialCounters.call(this);
+    this._intervals = {};
+    this._counters = initialCounters();
+    this._transports = [];
   }
 
   /**
@@ -22,7 +21,13 @@ class Monitoring extends EventEmitter {
    */
   async start() {
     registerEventSubscriptions.call(this, global.assembly);
-    initializeMonitoringTransports.call(this, global.assembly);
+
+    this._transports = [
+      new ConsoleMonitoring(global.assembly),
+      // NOTE: you can add other transports e.g. elasticsearch
+    ];
+
+    return Promise.all(this._transports.map(t => t.start()));
   }
 
   /**
@@ -31,15 +36,7 @@ class Monitoring extends EventEmitter {
    * @memberof Monitoring
    */
   async stop() {
-    Object.keys(this._intervals)
-      .forEach((monitoringType) => {
-        const id = this._intervals[monitoringType];
-        if (id) {
-          this._logger.info(`stopping monitoring.${monitoringType}`);
-          clearInterval(id);
-          this._intervals[monitoringType] = null;
-        }
-      });
+    return Promise.all(this._transports.map(t => t.stop()));
   }
 
   /**
@@ -52,7 +49,7 @@ class Monitoring extends EventEmitter {
   }
 }
 
-function createInitialCounters() {
+function initialCounters() {
   // NOTE: add the counters you want to store
   return {
     helloworld: {
@@ -72,32 +69,46 @@ function registerEventSubscriptions({ helloworld }) {
   }
 }
 
-function initializeMonitoringTransports() {
-  if (this._monitoringConfig.console) {
-    initializeConsoleMonitoring.call(this, this._monitoringConfig.console);
+/**
+ * Responsible for showing the counters on the console at an interval
+ */
+class ConsoleMonitoring {
+  constructor({
+    config,
+    logger,
+    monitoring,
+  }) {
+    assert(logger, 'expected logger');
+    assert(monitoring, 'expected monitoring');
+    assert(config && config.monitoring && config.monitoring.console, 'expected config.monitoring.console');
+
+    this._logger = logger;
+    this._monitoring = monitoring;
+    this._interval = config.monitoring.console.interval;
+
+    this._intervalID = null;
   }
 
-  // NOTE: you can add your code to send the monitoring data to another system
-  // like elasticsearch for example
-}
+  start() {
+    if (!this._interval || this._interval <= 0) {
+      return;
+    }
 
-function initializeConsoleMonitoring({
-  interval = oneHour,
-  pretty = false,
-}) {
-  if (interval <= 0) {
-    return;
+    this._logger.info(`Monitoring.console will log every ${this._interval}ms`);
+    this._intervalID = setInterval(() => {
+      this._logger.info(`\n\nCounters\n--------\n\u001b[34m${JSON.stringify(this._monitoring.counters, null, '  ')}\u001b[39m\n`);
+    }, this._interval);
   }
 
-  this._logger.info(`monitoring.console setup every ${interval}ms`);
-  this._intervals.console = setInterval(() => {
-    const counters = this.getCurrentCounters();
-    this._logger.info(JSON.stringify(
-      counters,
-      null,
-      pretty ? '  ' : '',
-    ));
-  }, interval);
+  stop() {
+    if (!this._intervalID) {
+      return;
+    }
+
+    this._logger.info('stopping monitoring.console');
+    clearInterval(this._intervalID);
+    this._intervalID = null;
+  }
 }
 
 module.exports = {

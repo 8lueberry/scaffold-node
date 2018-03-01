@@ -1,3 +1,4 @@
+const assert = require('assert');
 const winston = require('winston');
 
 const levels = {
@@ -9,14 +10,21 @@ const levels = {
   trace: 5,
 };
 
+const colors = {
+  fatal: 'red',
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  debug: 'blue',
+  trace: 'blue',
+};
+
 function logger() {
-  const result = winston.createLogger({
+  return winston.createLogger({
     transports: [
-      consoleTransport(),
+      consoleTransport(global.assembly),
     ],
   });
-
-  return result;
 }
 
 const myFormat = {
@@ -37,17 +45,11 @@ const myFormat = {
   }),
 };
 
-function consoleTransport() {
-  const colors = {
-    fatal: 'red',
-    error: 'red',
-    warn: 'yellow',
-    info: 'green',
-    debug: 'blue',
-    trace: 'yellow',
-  };
+function consoleTransport({ config }) {
+  assert(config && config.logger && config.logger.console, 'expected config.logger.console');
 
   return new winston.transports.Console({
+    level: config.logger.console.level || 'info',
     levels,
     format: winston.format.combine(
       myFormat.error(),
