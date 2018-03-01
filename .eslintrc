@@ -1,6 +1,0 @@
-{
-  "extends": "yp-base",
-  "env": {
-    "mocha": true
-  }
-}

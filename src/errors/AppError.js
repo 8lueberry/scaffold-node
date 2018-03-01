@@ -40,10 +40,12 @@
 class AppError extends Error {
   constructor({
     message, // error message
-    code, // app error code (follow the same concept as https://nodejs.org/api/errors.html#errors_error_code)
-    httpStatusCode = 500, // http response status code to return to the request
-    details, // custom data: add any custom data you need here
     innerError, // innerError (the stack will be displayed in the current stack)
+    code, // app error code (follow the same concept as https://nodejs.org/api/errors.html#errors_error_code)
+    details, // custom data: add any custom data you need here
+
+    // advanced config
+    httpStatusCode = 500, // http response status code to return to the request
     updateName = true, // whether the error name should be updated
   } = {}) {
     super(message);
@@ -57,20 +59,7 @@ class AppError extends Error {
     this.details = details;
     this.innerError = innerError;
 
-    this._initStack();
-  }
-
-  _initStack() {
-    if (!this.innerError) {
-      Error.captureStackTrace(this, this.constructor);
-      return;
-    }
-
-    // build a temporary error to build a custom stack containing the innerErr stack
-    const tempError = new Error(this.message);
-    tempError.name = this.name;
-    Error.captureStackTrace(tempError, this.constructor);
-    this.stack = `${tempError.stack}\n${this.innerError.stack}`;
+    initStack.call(this);
   }
 
   toString() {
@@ -86,6 +75,19 @@ class AppError extends Error {
 
     return result;
   }
+}
+
+function initStack() {
+  if (!this.innerError) {
+    Error.captureStackTrace(this, this.constructor);
+    return;
+  }
+
+  // build a temporary error to build a custom stack containing the innerErr stack
+  const tempError = new Error(this.message);
+  tempError.name = this.name;
+  Error.captureStackTrace(tempError, this.constructor);
+  this.stack = `${tempError.stack}\n${this.innerError.stack}`;
 }
 
 module.exports = {

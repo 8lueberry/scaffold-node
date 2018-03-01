@@ -22,7 +22,7 @@ class Router {
     assert(config, 'expected config');
     assert(monitoring, 'expected monitoring');
     assert(serviceDriver, 'expected serviceDriver');
-    
+
     this.logger = logger;
     this.config = config;
     this.monitoring = monitoring;
@@ -38,15 +38,15 @@ class Router {
   registerRoutes() {
     // global middleware
     this.serviceDriver.use(favicon(path.join(__dirname, 'favicon.ico')));
-    this.serviceDriver.use(bodyParser.json()); // for parsing application/json
-    this.serviceDriver.use(
-      bodyParser.urlencoded({ extended: true }) // application/x-www-form-urlencoded
-    );
+    // parsing application/json
+    this.serviceDriver.use(bodyParser.json());
+    // application/x-www-form-urlencoded
+    this.serviceDriver.use(bodyParser.urlencoded({ extended: true }));
 
     // global routes
     this.serviceDriver.get('/health', cors(), this.handleErrors(this.healthController));
     this.serviceDriver.get('/', (req, res) => this.homeController(req, res));
-    
+
     // socket
     /* scripts/socketio.js
     this.socketDriver.on('connection', socket => this.socketController(socket));
@@ -88,7 +88,7 @@ class Router {
   healthController(req, res) {
     const healthResult = {
       status: 200,
-      monitoring: this.monitoring.getCurrentCounters(),
+      monitoring: this.monitoring.counters,
       // NOTE: add your test for mongodb, elasticsearch...
       // https://itwiki.ypg.com/display/DT/Monitoring
     };
@@ -144,7 +144,7 @@ class Router {
   /* istanbul ignore next: ignore test for sample code */
   async sayHelloController(req, res) {
     // NOTE: The controller is responsible to handle input and output.
-    
+
     // NOTE: When calling your business logic, it should pass values needed explicitly.
     // Do not pass any framework object like express to the business logic.
 

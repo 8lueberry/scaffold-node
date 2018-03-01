@@ -1,9 +1,0 @@
-/**
- * DO NOT ADD CONFIGS HERE
- *
- * Consider adding your environment config in yp console
- * This will allow you to easily change the config without deploying
- * as well as keeping all your secrets outside of git
- */
-
-{}

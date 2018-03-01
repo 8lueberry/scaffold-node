@@ -1,12 +1,7 @@
-const appConfig = require('config');
+const config = require('config');
 const express = require('express');
-const fs = require('fs');
 const http = require('http');
-const pkg = require('../package.json');
-/* scripts/socketio.js
-const socketio = require('socket.io');
-scripts/socketio.js */
-const util = require('util');
+// const socketio = require('socket.io'); // scaffold-script socketio.js
 const winston = require('winston');
 const { Monitoring } = require('./Monitoring');
 const { Router } = require('./Router');
@@ -14,8 +9,6 @@ const { Router } = require('./Router');
 /* scripts/helloworld.js */
 const { HelloWorld } = require('./helloworld/HelloWorld');
 /* scripts/helloworld.js */
-
-const readFile = util.promisify(fs.readFile);
 
 /**
  * This class is responsible to build all the application common dependencies
@@ -30,144 +23,73 @@ class Assembly {
    *
    * @memberof Assembly
    */
-  async init(/* istanbul ignore next: default values */ {
-    externalConfigPath = '/run/config/ypcloud.io/config.json' } = {}
-  ) {
+  async init() {
     // core
-    this.assembly = this;
-    this.logger = await this._initLogger();
-    this._initGlobal();
+    global.assembly = this;
 
-    // tools
-    /* scripts/newrelic.js
-    require('newrelic'); // eslint-disable-line global-require
-    scripts/newrelic.js */
-
-    // configs
-    this.config = await this._initConfig({ externalConfigPath });
+    this.logger = initLogger();
+    this.config = config;
 
     // service
-    const serviceItems = await this._initService();
-    this.serviceDriver = serviceItems.serviceDriver;
-    this.httpServer = serviceItems.httpServer;
-    /* scripts/socketio.js
-    this.socketDriver = serviceItems.socketDriver;
-    scripts/socketio.js */
+    this.serviceDriver = express();
+    this.httpServer = http.Server(this.serviceDriver);
+    // this.socketDriver = socketio(httpServer); // scaffold-script socketio.js
 
-    // db connections
-    this.connections = await this._initConnections();
+    // deployment tools
+    // require('newrelic'); // eslint-disable-line global-require // scaffold-script socketio.js
 
     // app instances
-    await this._initAppInstances();
+    /* scripts/helloworld.js */
+    this.helloworld = new HelloWorld(this);
+    /* scripts/helloworld.js */
 
     // should be initialized last because it usually needs all the dependencies
     this.monitoring = new Monitoring(this);
     this.router = new Router(this);
   }
+}
 
-  /**
-   * This is where you would create your app instances.
-   *
-   * @memberof Assembly
-   */
-  async _initAppInstances() {
-    // NOTE: Creation order is important.
+function initLogger() {
+  const result = winston.createLogger({
+    transports: [
+      initLoggerConsoleTransport(),
+    ],
+  });
 
-    /* scripts/helloworld.js */
-    this.helloworld = new HelloWorld(this);
-    /* scripts/helloworld.js */
-  }
+  return result;
+}
 
-  /**
-   * Insert some items that available globally
-   * NOTE: Add only lightweight helper items, global should be avoided for business logic classes
-   *
-   * @memberof Assembly
-   */
-  _initGlobal() {
-    global.assembly = this.assembly;
-  }
+function initLoggerConsoleTransport() {
+  const levels = {
+    levels: {
+      error: 0,
+      warn: 1,
+      info: 2,
+      debug: 3,
+    },
+    colors: {
+      error: 'red',
+      warn: 'yellow',
+      info: 'green',
+      debug: 'blue',
+    },
+  };
 
-  /**
-   * Create the config objects. The config object consists of the local config `/config/*`
-   * in addition to the console config specified in the yp console https://console-develop.ypcloud.io/manage
-   * The console config will override existing configs if they exist in the local configs.
-   *
-   * @param {any} { externalConfigPath }
-   * @returns
-   * @memberof Assembly
-   */
-  async _initConfig({ externalConfigPath }) {
-    return appConfig;
-  }
+  const {
+    printf,
+    timestamp,
+    combine,
+    colorize,
+  } = winston.format;
 
-  /**
-   * Create the logger object. The logger used is the 'yp-logger' object that uses 'pino'
-   * internally.
-   *
-   * @returns
-   * @memberof Assembly
-   */
-  async _initLogger() {
-    return winston;
-  }
-
-  /**
-   * Create the service driver objects (and their dependencies). The default driver is
-   * express.
-   *
-   * @returns
-   * @memberof Assembly
-   */
-  async _initService() {
-    const serviceDriver = express();
-    const httpServer = http.Server(serviceDriver);
-    /* scripts/socketio.js
-    const socketDriver = socketio(httpServer);
-    scripts/socketio.js */
-    
-    return {
-      httpServer,
-      serviceDriver,
-      /* scripts/socketio.js
-      socketDriver,
-      scripts/socketio.js */
-    };
-  }
-
-  /**
-   * Create db connections here. This is where we can initialize connections that
-   * are shared throughout the project. We can also handle reconnections here.
-   *
-   * @memberof Assembly
-   */
-  async _initConnections() {
-    // NOTE: Put shared connections here.
-    // As a good practice, connection error handling should be done here
-    // Return a promise for flexibility (see /src/helloworld/HelloWorld.js for usage example)
-
-    // const { MongoClient } = require('mongodb');
-    // const myConnectionMongo = Promise.resolve()
-    //   .then(() => MongoClient.connect('mongodb://localhost:27017/test?authSource=admin&readPreference=secondaryPrefered'))
-    //   .catch((err) => {
-    //     this.logger.error(err);
-    //     throw new Error(`Error while connecting to mongodb://localhost (${err.message})`);
-    //   });
-
-    return {
-      // myConnectionMongo,
-    };
-  }
-
-  /**
-   * Cleans the instances. When the app stops, this method is called. We can put db
-   * connections disconnection for example.
-   *
-   * @memberof Assembly
-   */
-  async clean() {
-    // NOTE: This is where you put your cleaning before the process exits
-  }
+  return new winston.transports.Console({
+    levels,
+    format: combine(
+      colorize(),
+      timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      printf(i => `${i.level} \u001b[36m${i.timestamp}\u001b[39m ${i.message}`),
+    ),
+  });
 }
 
 module.exports = {

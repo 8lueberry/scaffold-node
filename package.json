@@ -1,12 +1,11 @@
 {
   "name": "your_service",
   "version": "1.0.0",
-  "description": "Service scaffolding with mocha, nyc, eslint",
+  "description": "Service scaffolding",
   "scaffold-version": "1.0.0",
   "author": {
     "name": "Dan Le Van",
-    "url": "https://github.com/danlevan/scaffold-node",
-    "email": "email@gmail.com"
+    "url": "https://github.com/danlevan/scaffold-node"
   },
   "main": "src/index.js",
   "private": true,
@@ -21,45 +20,47 @@
     ],
     "ext": "js json json5"
   },
+  "jest": {
+    "clearMocks": true
+  },
+  "eslintConfig": {
+    "extends": "airbnb-base",
+    "rules": {
+      "class-methods-use-this": "off",
+      "no-use-before-define": "off",
+      "no-underscore-dangle": "off"
+    },
+    "env": {
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 8
+    }
+  },
   "dependencies": {
     "body-parser": "1.18.2",
     "config": "1.27.0",
     "cors": "2.8.4",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.7.0",
     "express": "4.16.2",
     "json5": "0.5.1",
     "serve-favicon": "2.4.5",
-    "winston": "^2.4.0"
+    "winston": "^3.0.0-rc0"
   },
   "devDependencies": {
-    "chai": "4.1.0",
-    "chai-as-promised": "7.1.1",
-    "chai-http": "3.0.0",
-    "dirty-chai": "2.0.1",
-    "eslint": "4.3.0",
+    "eslint": "^4.9.0",
+    "jest": "^22.4.2",
     "jsdoc": "3.5.3",
-    "mocha": "3.4.2",
     "nodemon": "1.12.1",
-    "nyc": "11.0.3",
     "proxyquire": "1.8.0",
-    "replace-in-file": "3.0.0-beta.2",
-    "sinon": "2.3.8",
-    "sinon-chai": "2.12.0"
+    "replace-in-file": "3.0.0-beta.2"
   },
   "scripts": {
     "start": "node src/index.js",
-    "test": "npm run lint && npm run coverage",
-    "test:unit": "mocha",
-    "test:integration": "mocha --opts test/integration/mocha.opts",
-    "coverage": "nyc --check-coverage --reporter=text --reporter=lcov mocha",
-    "coverage:show": "open coverage/lcov-report/index.html",
+    "test": "npm run lint && jest",
     "lint": "eslint src test",
     "doc": "jsdoc src/**/*.js --destination ./.jsdoc",
-    "watch": "nodemon",
-    "remove:all": "npm run remove:helloworld && npm run remove:socketio && npm run remove:newrelic",
-    "remove:helloworld": "node scripts/helloworld.js remove",
-    "add:socketio": "node scripts/socketio.js add && npm install socket.io@2.0.4 --save",
-    "remove:socketio": "node scripts/socketio.js remove",
-    "add:newrelic": "node scripts/newrelic.js add && npm install newrelic@2.4.1 --save",
-    "remove:newrelic": "node scripts/newrelic.js remove"
+    "watch": "nodemon"
   }
 }
