@@ -51,16 +51,13 @@
   "devDependencies": {
     "eslint": "^4.9.0",
     "jest": "^22.4.2",
-    "jsdoc": "3.5.3",
     "nodemon": "1.12.1",
-    "proxyquire": "1.8.0",
     "replace-in-file": "3.0.0-beta.2"
   },
   "scripts": {
     "start": "node src/index.js",
     "test": "npm run lint && jest",
     "lint": "eslint src test",
-    "doc": "jsdoc src/**/*.js --destination ./.jsdoc",
     "watch": "nodemon"
   }
 }

@@ -113,7 +113,10 @@ function exit({
   }
 
   if (error) {
-    logger.error(error);
+    logger.error({
+      message: 'Exit with error',
+      error,
+    });
   }
 
   if (clean) {

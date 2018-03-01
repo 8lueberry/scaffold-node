@@ -8,188 +8,165 @@ const pkg = require('../package.json');
 class Router {
   constructor({
     logger,
-    config,
     monitoring,
     serviceDriver,
-    /* scripts/socketio.js
-    socketDriver,
-    scripts/socketio.js */
-    /* scripts/helloworld.js */
-    helloworld,
-    /* scripts/helloworld.js */
+    // socketDriver, // npm run snippet remove socketio
+    helloworld, // npm run snippet remove helloworld
   }) {
     assert(logger, 'expected logger');
-    assert(config, 'expected config');
     assert(monitoring, 'expected monitoring');
     assert(serviceDriver, 'expected serviceDriver');
 
-    this.logger = logger;
-    this.config = config;
-    this.monitoring = monitoring;
-    this.serviceDriver = serviceDriver;
-    /* scripts/socketio.js
-    this.socketDriver = socketDriver;
-    scripts/socketio.js */
-    /* scripts/helloworld.js */
-    this.helloworld = helloworld;
-    /* scripts/helloworld.js */
+    this._logger = logger;
+    this._monitoring = monitoring;
+    this._serviceDriver = serviceDriver;
+    // this._socketDriver = socketDriver; // npm run snippet remove socketio
+    this._helloworld = helloworld; // npm run snippet remove helloworld
   }
 
   registerRoutes() {
+    const handleAsync = runAsyncAndHandleErrors.bind(this); // TODO how to make this cleaner
+
     // global middleware
-    this.serviceDriver.use(favicon(path.join(__dirname, 'favicon.ico')));
-    // parsing application/json
-    this.serviceDriver.use(bodyParser.json());
-    // application/x-www-form-urlencoded
-    this.serviceDriver.use(bodyParser.urlencoded({ extended: true }));
+    this._serviceDriver.use(favicon(path.join(__dirname, 'favicon.ico')));
+    this._serviceDriver.use(bodyParser.json()); // application/json
+    this._serviceDriver.use(bodyParser.urlencoded({ // application/x-www-form-urlencoded
+      extended: true,
+    }));
+
+    /* npm run snippet remove socketio
+    // socket.io
+    this._socketDriver.on('connection', this.socketController);
+
+    const socketioClientDistPath = path.join(__dirname, '../node_modules/socket.io-client/dist');
+    this._serviceDriver.use('/hellosocket/lib', require('express').static(socketioClientDistPath));
+    this._serviceDriver.get('/hellosocket', this.handleErrors(this.sayHelloSocketController));
+    // npm run snippet remove socketio */
 
     // global routes
-    this.serviceDriver.get('/health', cors(), this.handleErrors(this.healthController));
-    this.serviceDriver.get('/', (req, res) => this.homeController(req, res));
+    this._serviceDriver.get('/', handleAsync(homeController));
+    this._serviceDriver.get('/health', cors(), handleAsync(healthController));
 
-    // socket
-    /* scripts/socketio.js
-    this.socketDriver.on('connection', socket => this.socketController(socket));
-
-    // example client page to connect with the websocket
-    const socketioClientDistPath = path.join(__dirname, '../node_modules/socket.io-client/dist');
-    this.serviceDriver.use('/lib', require('express').static(socketioClientDistPath));
-    this.serviceDriver.get('/hellosocket', this.handleErrors(this.sayHelloSocketController));
-    scripts/socketio.js */
-
-    // NOTE: this is where you would register your routes
-
-    /* scripts/helloworld.js */
-    this.serviceDriver.get('/helloworld', this.handleErrors(this.sayHelloController));
-    /* scripts/helloworld.js */
+    this._serviceDriver.get('/helloworld', handleAsync(sayHelloController)); // npm run snippet remove helloworld
 
     // error handler, should be registered last
-    this.serviceDriver.use(this.errorMiddleware.bind(this));
+    this._serviceDriver.use(errorMiddleware.bind(this));
   }
-
-  /**
-   * GET: /home
-   *
-   * @param {any} req
-   * @param {any} res
-   * @memberof Router
-   */
-  homeController(req, res) {
-    res.send(`<html><body>${pkg.name} v${pkg.version}</body></html>`);
-  }
-
-  /**
-   * GET: /health
-   *
-   * @param {any} req
-   * @param {any} res
-   * @memberof Router
-   */
-  healthController(req, res) {
-    const healthResult = {
-      status: 200,
-      monitoring: this.monitoring.counters,
-      // NOTE: add your test for mongodb, elasticsearch...
-      // https://itwiki.ypg.com/display/DT/Monitoring
-    };
-
-    res.json(healthResult);
-  }
-
-  /**
-   * Handle errors on all controllers
-   *
-   * @param {any} err
-   * @param {any} res
-   * @param {any} req
-   * @param {any} next
-   *
-   * @memberof Router
-   */
-  errorMiddleware(err, req, res, /* eslint-disable */ next) {
-    this.logger.error(err, 'Unexpected route error');
-    const body = {
-      errorMessage: err.message,
-    };
-    res.json(body);
-  }
-
-  /**
-   * Wraps the controller in an error handling code
-   * This allows your controller to return a promise and errors will be handled by the error middleware
-   *
-   * @param {any} controller
-   * @returns
-   * @memberof Router
-   */
-  handleErrors(controller) {
-    const self = this;
-    return async function(req, res) {
-      try {
-        await controller.bind(self)(req, res);
-      } catch (err) {
-        self.errorMiddleware(err, req, res);
-      }
-    };
-  }
-
-  /* scripts/helloworld.js */
-  /**
-   * GET: /helloworld
-   *
-   * @param {any} req
-   * @param {any} res
-   * @memberof Router
-   */
-  /* istanbul ignore next: ignore test for sample code */
-  async sayHelloController(req, res) {
-    // NOTE: The controller is responsible to handle input and output.
-
-    // NOTE: When calling your business logic, it should pass values needed explicitly.
-    // Do not pass any framework object like express to the business logic.
-
-    // NOTE: Because we registered the controller with handleErrors
-    // we can return a promise or throw an error
-
-    const result = await this.helloworld.sayHello(req.query); // input will be destructured
-    const body = {
-      data: result,
-    };
-    res.json(body);
-  }
-  /* scripts/helloworld.js */
-
-  /* scripts/socketio.js
-
-  // creates a testing html page
-  sayHelloSocketController(req, res) {
-    res.send(`<!doctype html><html><head></head><body><div id="debug"></div><script src="/lib/socket.io.slim.js"></script><script>
-  window.onload = () => {
-    const socket = io();
-    socket.on('hello', ({ sender }) => {
-      document.getElementById('debug').innerHTML += 'Got hello from ' + sender + '<br />';
-      document.getElementById('debug').innerHTML += 'Sending hello to server<br />';
-      socket.emit('hello', { sender: 'browser' });
-    });
-  }
-</script></body></html>`);
-  }
-
-  // entry point for the socket
-  socketController(socket) {
-    this.logger.debug('(socket) A client connected');
-    socket.emit('hello', { sender: 'server' });
-
-    socket.on('hello', ({ sender }) => {
-      this.logger.debug(`(socket) Got hello from ${sender}`);
-    });
-
-    socket.on('disconnect', () => {
-      this.logger.debug('(socket) A client disconnected');
-    });
-  }
-  scripts/socketio.js */
 }
+
+/**
+ * Wraps the controller in an error handling code
+ * This allows your controller to be async where errors will be handled
+ *
+ * @param {any} controller
+ * @returns
+ * @memberof Router
+ */
+function runAsyncAndHandleErrors(controller) {
+  const context = this;
+  return async function doHandleErrors(req, res) {
+    try {
+      await controller.call(context, req, res);
+    } catch (err) {
+      errorMiddleware.call(context, err, req, res);
+    }
+  };
+}
+
+/**
+ * Handle errors on all controllers
+ *
+ * @param {any} err
+ * @param {any} res
+ * @param {any} req
+ * @param {any} next
+ *
+ * @memberof Router
+ */
+function errorMiddleware(err, req, res, /* eslint-disable */ next) {
+  this._logger.error({
+    message: 'Unexpected route error',
+    err,
+  });
+
+  const body = {
+    errorMessage: err.message,
+  };
+  res.json(body);
+}
+
+/**
+ * GET: /home
+ *
+ * @param {any} req
+ * @param {any} res
+ * @memberof Router
+ */
+function homeController(req, res) {
+  res.send(`<html><body>${pkg.name} v${pkg.version}</body></html>`);
+}
+
+/**
+ * GET: /health
+ *
+ * @param {any} req
+ * @param {any} res
+ * @memberof Router
+ */
+function healthController(req, res) {
+  const healthResult = {
+    status: 'ok',
+    monitoring: this._monitoring.counters,
+    // NOTE: you can add your own monitoring stats here (e.g. db status)
+  };
+
+  res.json(healthResult);
+}
+
+// /* npm run snippet remove helloworld
+async function sayHelloController(req, res) {
+  // NOTE: The controller is responsible to handle input and output.
+
+  // NOTE: When calling your business logic, it should pass values needed explicitly.
+  // Do not pass any framework object like express to the business logic.
+
+  // NOTE: Because we registered the controller with runAsyncAndHandleErrors
+  // we can return a promise or throw an error
+
+  const result = await this._helloworld.sayHello(req.query); // input will be destructured
+  res.json({
+    data: result,
+  });
+}
+// npm run snippet remove socketio */
+
+/* npm run snippet remove socketio
+function sayHelloSocketController(req, res) {
+  res.send(`<!doctype html><html><body><script src="/hellosocket/lib/socket.io.slim.js"></script><script>
+window.onload = () => {
+  const socket = io();
+  socket.on('hello', ({ sender }) => {
+    document.write('Got hello from ' + sender + '<br />');
+    document.write('Sending hello to server<br />');
+    socket.emit('hello', { sender: 'browser' });
+  });
+}
+</script></body></html>`);
+}
+
+function socketController(socket) {
+  this._logger.debug('(socket) A client connected');
+  socket.emit('hello', { sender: 'server' });
+
+  socket.on('hello', ({ sender }) => {
+    this._logger.debug(`(socket) Got hello from ${sender}`);
+  });
+
+  socket.on('disconnect', () => {
+    this._logger.debug('(socket) A client disconnected');
+  });
+}
+// npm run snippet remove socketio */
 
 module.exports = {
   Router,

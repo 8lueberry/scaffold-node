@@ -21,22 +21,7 @@ class HelloWorld extends EventEmitter {
     super();
     assert(logger, 'expected logger');
 
-    this.logger = logger;
-
-    // NOTE: you can optionally create a child logger that will add the extra data for all logs
-    // this.logger = logger.context({ MyModule: 'helloworld' });
-
-    // NOTE: example if you need to connect to a db. 'connections' is created in /src/Assembly.js
-
-    // assert(connections && connections.myConnectionMongo, 'expected myConnectionMongo');
-    // try {
-    //   const db = await connections.myConnectionMongo;
-    //   const collection = await db.collection('test');
-    //   const result = collection.findOne();
-    //   this.logger.debug(`Result from DB: ${result ? JSON.stringify(result) : 'nothing'}`);
-    // } catch (err) {
-    //   this.logger.error(err);
-    // }
+    this._logger = logger;
   }
 
   /* istanbul ignore next: ignore test for sample code */
@@ -47,7 +32,7 @@ class HelloWorld extends EventEmitter {
     // At this point, there should be no references to express or server framework.
     // This is your business logic only.
 
-    this.logger.debug('sayHello called');
+    this._logger.debug('sayHello called');
 
     // Monitoring.js wants to monitor every time this is called
     // Instead of passing monitoring to this class (high coupling), this class can emit events

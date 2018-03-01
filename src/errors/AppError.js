@@ -70,7 +70,7 @@ class AppError extends Error {
     }
 
     if (this.innerError) {
-      result += `. ${this.innerError.toString()}.`;
+      result += `.\n└─ ${this.innerError.toString()}.`;
     }
 
     return result;
