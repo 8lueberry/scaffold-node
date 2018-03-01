@@ -35,7 +35,7 @@ class Monitoring extends EventEmitter {
       .forEach((monitoringType) => {
         const id = this._intervals[monitoringType];
         if (id) {
-          this.logger.info(`stopping monitoring.${monitoringType}`);
+          this._logger.info(`stopping monitoring.${monitoringType}`);
           clearInterval(id);
           this._intervals[monitoringType] = null;
         }
@@ -89,10 +89,10 @@ function initializeConsoleMonitoring({
     return;
   }
 
-  this.logger.info(`monitoring.console setup every ${interval}ms`);
+  this._logger.info(`monitoring.console setup every ${interval}ms`);
   this._intervals.console = setInterval(() => {
     const counters = this.getCurrentCounters();
-    this.logger.info(JSON.stringify(
+    this._logger.info(JSON.stringify(
       counters,
       null,
       pretty ? '  ' : '',
