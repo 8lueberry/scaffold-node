@@ -64,4 +64,4 @@ function logger() {
 }
 
 /* istanbul ignore next */
-module.exports = logger();
+module.exports = logger;

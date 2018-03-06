@@ -19,7 +19,7 @@ jest.mock('http', () => ({
   }),
 }));
 
-jest.mock('./Logger', () => ({
+jest.mock('./Logger', () => jest.fn().mockReturnValue({
   test: 'logger',
 }));
 

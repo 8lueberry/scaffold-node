@@ -25,7 +25,7 @@ class Assembly {
     global.assembly = this;
 
     this.config = config;
-    this.logger = logger;
+    this.logger = logger();
 
     // service
     this.serviceDriver = express();
