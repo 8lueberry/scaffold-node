@@ -30,12 +30,15 @@
 ```
 .
 ├── /config/                    # Your app configs
-├── /db/                        # DB migration scripts here
+├── /coverage/                  # (generated) Test coverage files
+├── /node_modules/              # (generated) Npm dependencies
 ├── /scripts/                   # custom npm command script
 ├── /src/                       # The source code of the application
+│   ├── /AppError.js            # Error base class (supports innerError...)
 │   ├── /Assembly.js            # Builds all the application dependencies
 │   ├── /Bootstrapper.js        # Builds all the application dependencies
 │   ├── /index.js               # Server-side startup script
+│   ├── /Logger.js              # Logger code
 │   ├── /Monitoring.js          # Monitoring code
 │   └── /Router.js              # Service routes
 ├── .editorconfig               # editor config (http://editorconfig.org/)

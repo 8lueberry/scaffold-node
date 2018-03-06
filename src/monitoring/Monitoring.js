@@ -1,4 +1,5 @@
 const assert = require('assert');
+const transports = require('./transports');
 const { EventEmitter } = require('events');
 
 class Monitoring extends EventEmitter {
@@ -12,6 +13,7 @@ class Monitoring extends EventEmitter {
     this._intervals = {};
     this._counters = initialCounters();
     this._transports = [];
+    this._isStarted = false;
   }
 
   /**
@@ -20,10 +22,16 @@ class Monitoring extends EventEmitter {
    * @memberof Monitoring
    */
   async start() {
+    if (this._isStarted) {
+      throw new Error('Monitoring already started');
+    }
+
+    this._isStarted = true;
+
     registerEventSubscriptions.call(this, global.assembly);
 
     this._transports = [
-      new ConsoleMonitoring(global.assembly),
+      new transports.Console(global.assembly),
       // NOTE: you can add other transports e.g. elasticsearch
     ];
 
@@ -59,55 +67,16 @@ function initialCounters() {
   };
 }
 
-function registerEventSubscriptions({ helloworld }) {
+function registerEventSubscriptions(/* istanbul ignore next: default values */ {
+  helloworld,
+} = {}) {
+  /* istanbul ignore next */
   if (helloworld) {
     helloworld.on('call', (name) => {
       const counter = this._counters.helloworld;
       counter.count += 1;
       counter.names[name] = counter.names[name] ? counter.names[name] + 1 : 1;
     });
-  }
-}
-
-/**
- * Responsible for showing the counters on the console at an interval
- */
-class ConsoleMonitoring {
-  constructor({
-    config,
-    logger,
-    monitoring,
-  }) {
-    assert(logger, 'expected logger');
-    assert(monitoring, 'expected monitoring');
-    assert(config && config.monitoring && config.monitoring.console, 'expected config.monitoring.console');
-
-    this._logger = logger;
-    this._monitoring = monitoring;
-    this._interval = config.monitoring.console.interval;
-
-    this._intervalID = null;
-  }
-
-  start() {
-    if (!this._interval || this._interval <= 0) {
-      return;
-    }
-
-    this._logger.info(`Monitoring.console will log every ${this._interval}ms`);
-    this._intervalID = setInterval(() => {
-      this._logger.info(`\n\nCounters\n--------\n\u001b[34m${JSON.stringify(this._monitoring.counters, null, '  ')}\u001b[39m\n`);
-    }, this._interval);
-  }
-
-  stop() {
-    if (!this._intervalID) {
-      return;
-    }
-
-    this._logger.info('stopping monitoring.console');
-    clearInterval(this._intervalID);
-    this._intervalID = null;
   }
 }
 

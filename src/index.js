@@ -6,7 +6,7 @@ async function run() {
   try {
     bootstrapper = new Bootstrapper();
     await bootstrapper.bootstrap();
-  } catch (err) {
+  } catch (err) /* istanbul ignore next: hard to test process.exit */ {
     console.error('Unexpected error during initialization', err); // eslint-disable-line no-console
     process.exit(returnCodes.UNCAUGHTEXCEPTION);
   }

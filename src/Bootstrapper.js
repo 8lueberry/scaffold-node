@@ -1,5 +1,5 @@
 const assert = require('assert');
-const errors = require('./errors');
+const { AppError } = require('./AppError');
 const { Assembly } = require('./Assembly');
 
 const returnCodes = {
@@ -60,6 +60,7 @@ async function startMonitoring() {
 /**
  * Attaches a handler for various exit conditions
  */
+/* istanbul ignore next: hard to test process */
 function registerExitHandler() {
   process.on('exit', code => exit.call(this, {
     code,
@@ -73,7 +74,7 @@ function registerExitHandler() {
 
   process.on('unhandledRejection', err => exit.call(this, {
     code: returnCodes.UNCAUGHTREJECTION,
-    error: new errors.AppError({
+    error: new AppError({
       message: 'Unexpected error (uncaught rejection). Make sure all your promise chain are caught.',
       innerError: err,
     }),
@@ -81,16 +82,14 @@ function registerExitHandler() {
 
   process.on('uncaughtException', err => exit.call(this, {
     code: returnCodes.UNCAUGHTEXCEPTION,
-    error: new errors.AppError({
+    error: new AppError({
       message: 'Unexpected error (uncaught exception)',
       innerError: err,
     }),
   }));
 }
 
-/**
- * Exits
- */
+/* istanbul ignore next: hard to test process */
 function exit({
   code,
   message,
@@ -129,9 +128,7 @@ function exit({
   process.exit(code);
 }
 
-/**
- * Cleanup and exit
- */
+/* istanbul ignore next: hard to test process */
 function cleanAndExit({
   code,
 }) {
@@ -144,6 +141,7 @@ function cleanAndExit({
   cleanForceExit.call(this, { code, inSeconds: 3 });
 }
 
+/* istanbul ignore next: hard to test process */
 function cleanForceExit({ code, inSeconds }) {
   const { logger } = this.assembly;
   assert(logger, 'expected logger');

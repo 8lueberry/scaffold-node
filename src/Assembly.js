@@ -3,8 +3,8 @@ const express = require('express');
 const http = require('http');
 const logger = require('./Logger');
 // const socketio = require('socket.io'); // npm run snippet remove socketio
-const { HelloWorld } = require('./helloworld/HelloWorld'); // npm run snippet remove helloworld
-const { Monitoring } = require('./Monitoring');
+const { HelloWorld } = require('./helloworld'); // npm run snippet remove helloworld
+const { Monitoring } = require('./monitoring');
 const { Router } = require('./Router');
 
 /**
@@ -25,7 +25,7 @@ class Assembly {
     global.assembly = this;
 
     this.config = config;
-    this.logger = logger();
+    this.logger = logger;
 
     // service
     this.serviceDriver = express();

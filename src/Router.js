@@ -5,6 +5,9 @@ const favicon = require('serve-favicon');
 const path = require('path');
 const pkg = require('../package.json');
 
+/**
+ * The router class is responsible to register the service endpoints
+ */
 class Router {
   constructor({
     logger,
@@ -75,13 +78,6 @@ function runAsyncAndHandleErrors(controller) {
 
 /**
  * Handle errors on all controllers
- *
- * @param {any} err
- * @param {any} res
- * @param {any} req
- * @param {any} next
- *
- * @memberof Router
  */
 function errorMiddleware(err, req, res, /* eslint-disable */ next) {
   this._logger.error({
@@ -96,11 +92,7 @@ function errorMiddleware(err, req, res, /* eslint-disable */ next) {
 }
 
 /**
- * GET: /home
- *
- * @param {any} req
- * @param {any} res
- * @memberof Router
+ * GET: /
  */
 function homeController(req, res) {
   res.send(`<html><body>${pkg.name} v${pkg.version}</body></html>`);
@@ -108,10 +100,6 @@ function homeController(req, res) {
 
 /**
  * GET: /health
- *
- * @param {any} req
- * @param {any} res
- * @memberof Router
  */
 function healthController(req, res) {
   const healthResult = {
@@ -124,6 +112,10 @@ function healthController(req, res) {
 }
 
 // /* npm run snippet remove helloworld
+/**
+ * GET: /helloworld
+ */
+/* istanbul ignore next */
 async function sayHelloController(req, res) {
   // NOTE: The controller is responsible to handle input and output.
 

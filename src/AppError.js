@@ -3,7 +3,7 @@
  * The goal of this error is to display the stack with the inner error stacks.
  *
  * e.g.
- * throw new errors.AppError({
+ * throw new AppError({
  *   ...
  *   message: 'This is a test error',
  *   innerError: new Error('You can pass any innerError and the stack should show this also'),
@@ -46,14 +46,9 @@ class AppError extends Error {
 
     // advanced config
     httpStatusCode = 500, // http response status code to return to the request
-    updateName = true, // whether the error name should be updated
   } = {}) {
     super(message);
-
-    if (updateName) {
-      this.name = this.constructor.name;
-    }
-
+    this.name = this.constructor.name;
     this.code = code;
     this.httpStatusCode = httpStatusCode;
     this.details = details;

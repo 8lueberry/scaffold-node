@@ -1,7 +1,8 @@
 const assert = require('assert');
-const errors = require('../errors');
+const { HelloError } = require('./HelloError');
 const { EventEmitter } = require('events');
 
+/* istanbul ignore next */
 class HelloWorld extends EventEmitter {
   /**
    * If you create your instance in the Assembly, you can use Object destructuring to get
@@ -16,10 +17,10 @@ class HelloWorld extends EventEmitter {
     super(); // EventEmitter
 
     assert(logger, 'expected logger');
-    assert(config && config.helloworld, 'expected config.helloworld');
+    assert(config, 'expected config');
 
     this._logger = logger;
-    this._greetings = config.helloworld.greetings;
+    this._greetings = config.helloworld ? config.helloworld.greetings : null || 'Hello';
 
     // NOTE: if you need to create internal new objects, you have reference of the assembly
     // this._myNewObject(global.assembly);
@@ -40,15 +41,8 @@ class HelloWorld extends EventEmitter {
     // example of throwing an error
     // http://localhost:8008/helloworld?name=error
     if (name === 'error') {
-      throw new errors.AppError({
-        // internal error code https://nodejs.org/api/errors.html#errors_error_code
-        code: 'ERR_HELLOWORLD_NAME_ERROR',
-        // http return status code
-        httpStatusCode: 500,
-        // error message
-        message: 'This is a test error',
-        // inner errors will be shown on the stack
-        innerError: new Error('You can pass any innerError and the stack should show this also'),
+      throw new HelloError({
+        innerError: new Error('You passed error as name'),
       });
     }
 
